@@ -88,12 +88,12 @@ def run_git_hooks():
     branch = None
     repo = None
     data = None
+    #print('request: ' + str(bottle.request))
     if bottle.request.json:
         data = bottle.request.json
     elif bottle.request.forms.get('payload', None):
         data = json.loads(bottle.request.forms.get('payload'))
     elif bottle.request.POST.get('hook', None):
-        # parse response on git.oschina.net WebHook
         data = json.loads(bottle.request.POST.get('hook'))
         data = data['push_data']
     log.debug('POST / request =>\n%s' % pformat(data))
@@ -107,6 +107,8 @@ def run_git_hooks():
             branch = data['ref'].split('/')[-1]
         elif 'commits' in data and len(data['commits']) > 0:
             branch = data['commits'][0]['branch']
+        elif 'push' in data and 'changes' in data['push'] and len(data['push']['changes']) > 0:
+            branch = data['push']['changes'][0]['new']['name']
 
     return run_hooks(repo, branch)
 
