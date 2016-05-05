@@ -92,6 +92,10 @@ def run_git_hooks():
         data = bottle.request.json
     elif bottle.request.forms.get('payload', None):
         data = json.loads(bottle.request.forms.get('payload'))
+    elif bottle.request.POST.get('hook', None):
+        # parse response on git.oschina.net WebHook
+        data = json.loads(bottle.request.POST.get('hook'))
+        data = data['push_data']
     log.debug('POST / request =>\n%s' % pformat(data))
 
     if data:
